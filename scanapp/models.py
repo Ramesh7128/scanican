@@ -78,66 +78,84 @@ class ScanSession(models.Model):
 
 
 class Barcode(db.Model):
-    __tablename__ = 'barcode'
-    id = db.Column(db.Integer, primary_key=True)
-    scan_format = db.Column(db.String(64))
-    scan_code = db.Column(db.String(256))
-    scanned_products = db.relationship('ScannedProduct', backref='barcode', lazy='dynamic')
+    # __tablename__ = 'barcode'
+    # id = db.Column(db.Integer, primary_key=True)
+    # scan_format = db.Column(db.String(64))
+    # scan_code = db.Column(db.String(256))
+    # scanned_products = db.relationship('ScannedProduct', backref='barcode', lazy='dynamic')
 
-    __table_args__ = ( db.UniqueConstraint('scan_format', 'scan_code'),  )
+    scan_format = models.CharField(max_length=64)
+    scan_code = models.CharField(max_length=256)
+    scanned_products = models.ForeignKey('ScannedProduct')
 
-    def __init__(self, scan_format, scan_code):
-        self.scan_format = scan_format
-        self.scan_code = scan_code
+    # __table_args__ = ( db.UniqueConstraint('scan_format', 'scan_code'),  )
+    #
+    # def __init__(self, scan_format, scan_code):
+    #     self.scan_format = scan_format
+    #     self.scan_code = scan_code
 
-class Product(db.Model):
-    __tablename__ = 'product'
-    id = db.Column(db.Integer, primary_key=True)
-    asin = db.Column(db.String(64), index=True)
-    marketplace = db.Column(db.Integer, index=True)
-    title = db.Column(db.String(512), nullable=True)
-    product_type = db.Column(db.String(128), nullable=True)
-    current_sales_rank = db.Column(db.Integer, nullable=True)
-    current_new_price = db.Column(db.Float, nullable=True)
-    current_new_quantity = db.Column(db.Integer, nullable=True)
-    current_used_price = db.Column(db.Float, nullable=True)
-    current_used_quantity = db.Column(db.Integer, nullable=True)
-    last_updated = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-    product_history = db.relationship('ProductHistory', backref='product', lazy='dynamic')
+class Product(models.Model):
+    # __tablename__ = 'product'
+    # id = db.Column(db.Integer, primary_key=True)
+    # asin = db.Column(db.String(64), index=True)
+    # marketplace = db.Column(db.Integer, index=True)
+    # title = db.Column(db.String(512), nullable=True)
+    # product_type = db.Column(db.String(128), nullable=True)
+    # current_sales_rank = db.Column(db.Integer, nullable=True)
+    # current_new_price = db.Column(db.Float, nullable=True)
+    # current_new_quantity = db.Column(db.Integer, nullable=True)
+    # current_used_price = db.Column(db.Float, nullable=True)
+    # current_used_quantity = db.Column(db.Integer, nullable=True)
+    # last_updated = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    # product_history = db.relationship('ProductHistory', backref='product', lazy='dynamic')
 
-    def __init__(self, asin, marketplace, title=None, product_type=None):
-        self.asin = asin
-        self.marketplace = marketplace
-        self.title = title
-        self.product_type = product_type
+    asin = models.CharField(max_length=64)
+    marketplace = models.IntegerField()
+    title = models.CharField(max_length=512)
+    product_type = models.CharField(max_length=128, null=True)
+    current_sales_rank = models.IntegerField(null=True)
+    current_new_price = models.FloatField(null=True)
+    current_new_quantity = models.IntegerField(null=True)
+    current_used_price = models.FloatField(null=True)
+    current_used_quantity = models.IntegerField(null=True)
+    last_updated = models.DateTimeField(default=datetime.now, auto_now_add=True)
+    product_history = models.ForeignKey('ProductHistory')
 
-    def update_product_history(self, product_history):
-        self.product_history.append(product_history)
-        self.current_sales_rank = product_history.sales_rank
-        self.current_new_price = product_history.new_price
-        self.current_new_quantity = product_history.new_quantity
-        self.current_used_price = product_history.used_price
-        self.current_used_quantity = product_history.used_quantity
+    # def __init__(self, asin, marketplace, title=None, product_type=None):
+    #     self.asin = asin
+    #     self.marketplace = marketplace
+    #     self.title = title
+    #     self.product_type = product_type
+    #
+    # def update_product_history(self, product_history):
+    #     self.product_history.append(product_history)
+    #     self.current_sales_rank = product_history.sales_rank
+    #     self.current_new_price = product_history.new_price
+    #     self.current_new_quantity = product_history.new_quantity
+    #     self.current_used_price = product_history.used_price
+    #     self.current_used_quantity = product_history.used_quantity
 
-class ProductHistory(db.Model):
-    __tablename__ = 'product_history'
-    id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), index=True)
-    sales_rank = db.Column(db.Integer, nullable=True)
-    new_price = db.Column(db.Float, nullable=True)
-    new_quantity = db.Column(db.Integer, nullable=True)
-    used_price = db.Column(db.Float, nullable=True)
-    used_quantity = db.Column(db.Integer, nullable=True)
-    added_date = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-    scanned_products = db.relationship('ScannedProduct', backref='product_history', lazy='dynamic')
+class ProductHistory(models.Model):
+    #__tablename__ = 'product_history'
+    # id = db.Column(db.Integer, primary_key=True)
+    # product_id = db.Column(db.Integer, db.ForeignKey('product.id'), index=True)
+    # sales_rank = db.Column(db.Integer, nullable=True)
+    # new_price = db.Column(db.Float, nullable=True)
+    # new_quantity = db.Column(db.Integer, nullable=True)
+    # used_price = db.Column(db.Float, nullable=True)
+    # used_quantity = db.Column(db.Integer, nullable=True)
+    # added_date = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    # scanned_products = db.relationship('ScannedProduct', backref='product_history', lazy='dynamic')
 
-    def __init__(self, product, sales_rank=None, new_price=None, new_quantity=None, used_price=None, used_quantity=None):
-        self.product_id = product.id
-        self.sales_rank = sales_rank
-        self.new_price = new_price
-        self.new_quantity = new_quantity
-        self.used_price = used_price
-        self.used_quantity = used_quantity
+    product_id = models.ForeignKey('Product')
+    sales_rank = models.IntegerField(null=True)
+    new_price = models.FloatField(null=True)
+    new_quantity = models.IntegerField(null=True)
+    used_price = models.FloatField(null=True)
+    used_quantity = models.IntegerField(null=True)
+    added_data = models.DateTimeField(default= datetime.now, auto_now_add=True) #check on auto_now_add
+    scanned_product = models.ForeignKey('ScannedProduct')
+
 
 class ScannedProduct(models.Model):
     # __tablename__ = 'scanned_product'
@@ -148,15 +166,8 @@ class ScannedProduct(models.Model):
     # matched_filter = db.Column(db.Boolean, default=True)
     # scanned_date = db.Column(db.DateTime, nullable=True)
 
-
-    id = models.IntegerField(primary_key=True)
     session_id = models.ForeignKey('ScanSession')
-    barcode_id
-
-    def __init__(self, session, barcode, product_history=None, scanned_date=datetime.now()):
-        self.session = session
-        self.barcode = barcode
-        if product_history:
-            self.product_history = product_history
-            self.matched_filter = True
-        self.scanned_date = scanned_date
+    barcode_id = models.ForeignKey('Barcode')
+    product_history_id = models.ForeignKey('ProductHistory')
+    matched_filter = models.BooleanField(default=True)
+    scanned_date = models.DateTimeField(null=True)
