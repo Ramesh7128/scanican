@@ -31,7 +31,6 @@ class Device(models.Model):
         return self.device_id
 
 
-
 class DeviceSession(models.Model):
 
     device = models.ForeignKey(Device)
@@ -47,7 +46,7 @@ class DeviceSession(models.Model):
 
 class ScanSession(models.Model):
 
-    device = models.ForeignKey(Device)
+    device = models.ForeignKey(Device, null=True)
     place_name = models.CharField(max_length=128, null=True)
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
@@ -56,10 +55,43 @@ class ScanSession(models.Model):
     total_spent = models.FloatField(default=0.0)
     total_profit = models.FloatField(default=0.0)
     session_start = models.DateTimeField(null=True)
-    session_end = models.DateTimeField(null=True)
 
 
-class ScannedProduct(models.model):
+    def __unicode__(self):
+        return self.device.device_id
+
+
+
+class Product(models.Model):
+
+    asin = models.CharField(max_length=64)
+    marketplace = models.IntegerField()
+    title = models.CharField(max_length=512, null=True)
+    product_type = models.CharField(max_length=128, null=True)
+    current_sales_rank = models.IntegerField(null=True)
+    current_new_price = models.FloatField(null=True)
+    current_new_quantity = models.IntegerField(null=True)
+    current_used_price = models.FloatField(null=True)
+    current_used_quantity = models.IntegerField(null=True)
+    last_updated = models.DateTimeField(auto_now_add=True)
+
+class Barcode(models.Model):
+
+    scan_format = models.CharField(max_length=64)
+    scan_code = models.CharField(max_length=256)
+
+class ProductHistory(models.Model):
+
+    product = models.ForeignKey(Product)
+    sales_rank = models.IntegerField(null=True)
+    new_price = models.FloatField(null=True)
+    new_quantity = models.IntegerField(null=True)
+    used_price = models.IntegerField(null=True)
+    used_quantity = models.IntegerField(null=True)
+    added_date = models.DateTimeField(default=datetime.now)
+
+
+class ScannedProduct(models.Model):
 
     scansession = models.ForeignKey(ScanSession)
     barcode = models.ForeignKey(Barcode)
@@ -68,9 +100,8 @@ class ScannedProduct(models.model):
     scanned_date = models.DateTimeField(null=True)
 
 
-class Barcode(models.Model):
 
-    scan_format = models.CharField(max_length=64)
+
 
 
 
